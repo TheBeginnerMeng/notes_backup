@@ -7,3 +7,16 @@
 - 编程语言：Python，Scheme，SQL
 - 课程难度：🌟🌟🌟
 - 预计学时：50小时
+
+## 学习记录
+
+> Lecture01-Intro
+
+> Lecture02-Functions
+
+> Lecture03-Control
+
+- [x] video，20220406
+- [ ] textbook reading
+- [ ] lab
+- [ ] homework & project
