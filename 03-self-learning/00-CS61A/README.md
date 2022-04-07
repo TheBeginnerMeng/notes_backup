@@ -19,4 +19,4 @@
 - [x] video-20220406
 - [ ] textbook reading
 - [x] lab-20220407
-- [ ] homework & project
+- [x] homework & project-20220407
