@@ -1,1 +1,2 @@
-*For learning notes backup.
+For learning notes backup.
+Work hard every day.
