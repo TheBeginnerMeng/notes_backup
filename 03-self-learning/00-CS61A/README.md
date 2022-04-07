@@ -16,7 +16,7 @@
 
 > Lecture03-Control
 
-- [x] video，20220406
+- [x] video-20220406
 - [ ] textbook reading
-- [ ] lab
+- [x] lab-20220407
 - [ ] homework & project
