@@ -14,7 +14,7 @@ import sys
 
 ```
 
-![image-20220420104944769](D:\software\Typora\images\image-20220420104944769.png)
+![](https://raw.githubusercontent.com/TheBeginnerMeng/notes_backup/main/img/image-20220420104944769.png?token=AHAKQ3W3WUYG3G23YZJOPPTCMELJA)
 
 如果想要手动添加路径，可以用`sys.path.append("xxx/path")`
 
@@ -130,7 +130,7 @@ f = copy.copy(c)  # 此时列表f是新生成的（id(f)和id(c)不同），但�
 
 ### 1.6.4 进制间的转换
 
-![image-20220421104409500](![](https://blog-image-1300352669.cos.ap-beijing.myqcloud.com/img/image-20220421104409500.png)
+![](https://raw.githubusercontent.com/TheBeginnerMeng/notes_backup/main/img/image-20220421104409500.png?token=AHAKQ3VVO2GG6CBJUXBRPSTCMELT2)
 
 ### 1.6.5 位运算
 
