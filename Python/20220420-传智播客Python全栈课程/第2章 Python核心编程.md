@@ -130,7 +130,7 @@ f = copy.copy(c)  # 此时列表f是新生成的（id(f)和id(c)不同），但�
 
 ### 1.6.4 进制间的转换
 
-![image-20220421104409500](D:\software\Typora\images\image-20220421104409500.png)
+![image-20220421104409500](![](https://blog-image-1300352669.cos.ap-beijing.myqcloud.com/img/image-20220421104409500.png)
 
 ### 1.6.5 位运算
 
