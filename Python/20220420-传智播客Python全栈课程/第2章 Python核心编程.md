@@ -11,16 +11,15 @@ import搜索模块的导入路径
 ```python
 import sys
 >>> sys.path
-
 ```
 
-![](https://raw.githubusercontent.com/TheBeginnerMeng/notes_backup/main/img/image-20220420104944769.png?token=AHAKQ3W3WUYG3G23YZJOPPTCMELJA)
+![image-20220420104944769](https://raw.githubusercontent.com/TheBeginnerMeng/notes_backup/main/imgs/image-20220420104944769.png?token=AHAKQ3VLQHSUX27NUHF3T5TCMS4J6)
 
 如果想要手动添加路径，可以用`sys.path.append("xxx/path")`
 
 ## 1.2 重新导入模块
 
-模块被导入后，使用`imp2ort xxx`不能重新导入模块，正确方式
+模块被导入后，使用`import xxx`不能重新导入模块，正确方式
 
 ```python
 import importlib
@@ -130,7 +129,7 @@ f = copy.copy(c)  # 此时列表f是新生成的（id(f)和id(c)不同），但�
 
 ### 1.6.4 进制间的转换
 
-![](https://raw.githubusercontent.com/TheBeginnerMeng/notes_backup/main/img/image-20220421104409500.png?token=AHAKQ3VVO2GG6CBJUXBRPSTCMELT2)
+![image-20220421104409500](https://raw.githubusercontent.com/TheBeginnerMeng/notes_backup/main/imgs/image-20220421104409500.png?token=AHAKQ3W3YQCKERQE5I667DTCMS4MA)
 
 ### 1.6.5 位运算
 
