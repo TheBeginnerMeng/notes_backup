@@ -1,13 +1,13 @@
 PEP: 8
 标题：Python代码样式指南
-版本：
+版本：修订版
 最近一次修改：
 作者：Guido van Rossum <guido@python.org>,
     Barry Warsaw <barry@python.org>,
     Nick Coghlan <ncoghlan@gmain.com>
-Status：活跃
-Type：进行
-Content-Type: text/x-rst
+状态：活跃
+类型：进行
+内容-类型: text/x-rst
 创建时间：2001-07-05
 发表时间：2001-07-05，2013-08-01
 
@@ -21,7 +21,7 @@ Content-Type: text/x-rst
 
 很多项目工程都有他们自己的编码风格指南。如果与本文的编码风格产生了歧义和冲突，那么请优先参见根据具体项目而制定的编码风格指南。
 
-不要一味地遵循教条
+不要一味地遵循教条主义
 ===============================
 
 Guido的关键思想之一是认为代码被阅读理解多于编写。此处提供的这份指南是为了提升代码的可读性，同时使其在Python编码的广泛应用中变得通用。正如PEP 20中所提到的，“可读性举足轻重”。
@@ -83,12 +83,67 @@ Guido的关键思想之一是认为代码被阅读理解多于编写。此处提
         print(var_one)
 ```
 
-后续的代码行可以选择性应用“四个空格”缩进规则。
+后续的代码行可以选择性地应用“四空格”缩进规则。
 
 可选择的方式：
 
 ```python
-# 悬浮缩进可能超过四个空格
+# 悬挂缩进可以不使用4个空格
+foo = long_function_name(
+  var_one, var_two,
+  var_three, var_four)
+```
 
+多行 if 表达式：
+
+当条件部分的 if 表达式足够长，需要跨多行书写时，注意可以在两个字符关键字的连接处（比如 if），加一个单独的空格，再加一个左括号，来给多行条件语句的后续代码行，创造一个合理的4-空格缩进。这可能会与嵌套在`if`表达式中的其他4-空格缩进代码产生视觉冲突。这份PEP中，没有明确指明在`if`表达式中如何（或者是否）进一步区分条件代码行和内嵌的代码行。
+
+可使用的可选项包括但不限于以下几种情况：
+
+```python
+# 没有额外的缩进
+if (this_is_one_thing and
+    that_is_another_thing):
+    do_something()
+    
+# 添加一条注释，在能提供语法高亮的编辑器中能提供一些区分
+if (this_is_one_thing and
+    that_is_another_thing):
+    # 既然所有的条件都为真，我们可以操作了
+    do_something()
+
+# 在后续条件判断的语句中添加额外的缩进
+if (this_is_one_thing
+   		and that_is_another_thing):
+    do_something()
+```
+
+（也可以参见下面关于是否在二进制操作符之前或之后截断的讨论）
+
+在多行结构中，大括号、中括号、小括号的右括号可以与内容列表的最后一行对齐后，另起一行作为第一个字符，就像这样：
+
+```python
+my_list = [
+    1, 2, 3,
+    4, 5, 6
+	]
+
+result = some_function_that_takes_arguments(
+	'a', 'b', 'c',
+	'd', 'e', 'f'
+	)
+```
+
+或者可能与开始多行结构的第一个字符行对齐，就像下面这样：
+
+```python
+my_list = [
+    1, 2, 3,
+    4, 5, 6
+]
+result = some_function_that_takes_arguments(
+	'a', 'b', 'c',
+	'd', 'e', 'f'
+)
 ```
 

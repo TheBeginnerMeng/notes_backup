@@ -84,17 +84,17 @@ arguments on the first line and further indentation should be used to
 clearly distinguish itself as a continuation line::
 
     # Correct:
-
+    
     # Aligned with opening delimiter.
     foo = long_function_name(var_one, var_two,
                              var_three, var_four)
-
+    
     # Add 4 spaces (an extra level of indentation) to distinguish arguments from the rest.
     def long_function_name(
             var_one, var_two, var_three,
             var_four):
         print(var_one)
-
+    
     # Hanging indents should add a level.
     foo = long_function_name(
         var_one, var_two,
@@ -103,11 +103,11 @@ clearly distinguish itself as a continuation line::
 ::
 
     # Wrong:
-
+    
     # Arguments on first line forbidden when not using vertical alignment.
     foo = long_function_name(var_one, var_two,
         var_three, var_four)
-
+    
     # Further indentation required as indentation is not distinguishable.
     def long_function_name(
         var_one, var_two, var_three,
@@ -128,7 +128,7 @@ Optional::
 When the conditional part of an ``if``-statement is long enough to require
 that it be written across multiple lines, it's worth noting that the
 combination of a two character keyword (i.e. ``if``), plus a single space,
-plus an opening parenthesis creates a natural 4-space indent for the
+plus an  creates a natural 4-space indent for the
 subsequent lines of the multiline conditional.  This can produce a visual
 conflict with the indented suite of code nested inside the ``if``-statement,
 which would also naturally be indented to 4 spaces.  This PEP takes no
@@ -140,14 +140,14 @@ Acceptable options in this situation include, but are not limited to::
     if (this_is_one_thing and
         that_is_another_thing):
         do_something()
-
+    
     # Add a comment, which will provide some distinction in editors
     # supporting syntax highlighting.
     if (this_is_one_thing and
         that_is_another_thing):
         # Since both conditions are true, we can frobnicate.
         do_something()
-
+    
     # Add some extra indentation on the conditional continuation line.
     if (this_is_one_thing
             and that_is_another_thing):
@@ -426,16 +426,16 @@ future-imports must appear in the module before any other code except
 docstrings::
 
     """This is the example module.
-
+    
     This module does stuff.
     """
-
+    
     from __future__ import barry_as_FLUFL
-
+    
     __all__ = ['a', 'b', 'c']
     __version__ = '0.1'
     __author__ = 'Cardinal Biggles'
-
+    
     import os
     import sys
 
@@ -660,13 +660,13 @@ Other Recommendations
       # Wrong:
       if foo == 'blah': do_blah_thing()
       else: do_non_blah_thing()
-
+    
       try: something()
       finally: cleanup()
-
+    
       do_one(); do_two(); do_three(long, argument,
                                    list, like, this)
-
+    
       if foo == 'blah': one(); two(); three()
 
 
@@ -780,7 +780,7 @@ Conventions for writing good documentation strings
   on a line by itself::
 
       """Return a foobang
-
+    
       Optional plotz says to frobnicate the bizbaz first.
       """
 
@@ -1302,13 +1302,13 @@ Programming Recommendations
   end of the function (if reachable)::
 
       # Correct:
-
+    
       def foo(x):
           if x >= 0:
               return math.sqrt(x)
           else:
               return None
-
+    
       def bar(x):
           if x < 0:
               return None
@@ -1317,11 +1317,11 @@ Programming Recommendations
   ::
 
       # Wrong:
-
+    
       def foo(x):
           if x >= 0:
               return math.sqrt(x)
-
+    
       def bar(x):
           if x < 0:
               return
@@ -1475,9 +1475,9 @@ similar to those on function annotations described above:
   exactly one space on both sides::
 
       # Correct:
-
+    
       code: int
-
+    
       class Point:
           coords: Tuple[int, int]
           label: str = '<unknown>'
@@ -1485,10 +1485,10 @@ similar to those on function annotations described above:
   ::
 
       # Wrong:
-
+    
       code:int  # No space after colon
       code : int  # Space before colon
-
+    
       class Test:
           result: int=0  # No spaces around equality sign
 
@@ -1531,7 +1531,6 @@ Copyright
 This document has been placed in the public domain.
 
 
-
 ..
    Local Variables:
    mode: indented-text
