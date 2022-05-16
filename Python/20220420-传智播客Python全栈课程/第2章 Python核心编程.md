@@ -365,7 +365,7 @@ In [61]: isinstance(100, Iterator)
 Out[61]: False
 ```
 
-#### 2.1.4 `iter()`方法
+#### 2.1.4 iter()方法
 
 生成器都是`Iterator`对象，但诸如list、tuple、set、dict等数据类型，虽然是`Iterable`的，但是都不是`Iterator`对象
 
@@ -472,8 +472,6 @@ print(c2())  # 53
 print(c2())  # 54
 ```
 
-
-
 #### 2.2.4 闭包的实际应用
 
 ```python
@@ -499,15 +497,259 @@ print(line2(5))
 
 ### 2.3 装饰器
 
+#### 2.3.1 定义
+
+写代码要遵循开放封闭原则
+
+- 开放：多扩展开放
+- 封闭：已经实现的功能代码
+
+装饰器代码示例：
+
+```python
+def w1(func):
+    def inner():
+        # 验证1
+        # 验证2
+        # 验证3
+        func()
+    return inner
+
+@w1
+def f1():
+    print('f1')
+```
+
+Python解释器在执行上述代码块时，执行顺序：
+
+1. def w1(func) —> 将函数w1加载到内存
+2. @w1
+
+`@w1`内部执行的操作：执行w1函数，并将装饰器下面的函数作为参数传入w1，即`@w1`等价于`w1(f1)`，内部会执行
+
+```python
+def w1(f1):
+    def inner():
+        # 验证1
+        # 验证2
+        # 验证3
+        原来的f1()
+    return inner
+```
+
+然后将执行完的w1函数的返回值赋值给f1，即：
+
+```python
+新f1 = def inner(): 
+            #验证 1
+            #验证 2
+            #验证 3
+            原来f1()
+```
+
+如此一来，以后业务部门再想调用执行f1函数时，就会执行新f1函数，从而在内部先进行验证，再执行原来的f1函数，然后再将原来f1函数的返回值返回给业务调用者。
+
+#### 2.3.2 被装饰的函数不带参数
+
+```python
+from time import ctime, sleep
 
 
+def time_func(func):
+    def wrapped_func():
+        print(f"{func.__name__} called at {ctime()}")
+        func()
+    return wrapped_func
+
+@time_func
+def foo():
+    print("I am foo")
+
+    
+foo()
+sleep(2)
+foo()
+```
+
+上面的代码理解装饰器执行行为可以理解为：
+
+```python
+foo = time_func(foo)
+#  foo先作为参数赋值给func后，foo再接收来自time_func返回的wrapped_func
+foo()
+#  调用foo()，等价于调用了wrapped_func()
+#  内部函数wrapped_func被引用，所以外部函数的func变量未被释放
+#  func里保存的是原foo函数对象
+```
+
+#### 2.3.3 被装饰的函数带有参数
+
+```python
+from time import ctime, sleep
 
 
+def time_func(func):
+    def wrapped_func(a, b):
+        print(f"{func.__name__} called at {ctime()}")
+        print(a, b)
+        func(a, b)
+    return wrapped_func
 
 
+@time_func
+def foo(a, b):
+    print(a + b)
+    
+
+foo(3, 5)
+sleep(2)
+foo(2, 4)
+```
+
+#### 2.3.4  被装饰的函数带有不定长参数
+
+```python
+from time import ctime, sleep
 
 
+def time_func(func):
+    def wrapped_func(*args, **kwargs):
+        print(f"{func.__name__} called at {ctime()}")
+        func(*args, **kwargs)
+    return wrapped_func
 
+
+@time_func
+def foo(a, b, c):
+    print(a + b + c)
+    
+    
+foo(3, 5, 7)
+sleep(2)
+foo(2, 4, 9)
+```
+
+#### 2.3.5 带有return的装饰器
+
+```python
+from time import ctime, sleep
+
+
+def time_func(func):
+    def wrapped_func():
+        print(f"{func.__name__} called at {ctime()}")
+        ret = func()
+        return ret
+    return wrapped_func
+
+
+@time_func
+def foo():
+    print("I am foo")
+    
+    
+@time_func
+def get_info():
+    return "hello world"
+
+
+foo()
+sleep(2)
+foo()
+
+print(get_info())
+```
+
+#### 2.3.6 通用装饰器
+
+```python
+def func(function_name):
+    def func_in(*args, **kwargs):
+        ret = function_name(*args, **kwargs)
+        return ret
+    return func_in
+```
+
+#### 2.3.7 自带参数的装饰器
+
+```python
+from time import ctime, sleep
+
+
+def timefunc_arg(pre="hello"):
+    def time_func(func):
+        def wrapped_func():
+            print(f"{func.__name__} called at {ctime()} {pre}")
+            return func()
+        return wrapped_func
+    return time_func
+
+
+@timefunc_arg("world")
+def foo():
+    print("I am foo")
+    
+    
+@timefunc_arg("python")
+def too():
+    print("I am too")
+
+    
+foo()
+sleep(2)
+foo()
+
+too()
+sleep(2)
+too()
+```
+
+#### 2.3.8 类装饰器
+
+装饰器函数其实是这样的一个接口约束，它必须接收一个callable对象作为参数，然后返回一个callable对象。在Python中callable对象一般都是函数，但也有例外。只要某个对象重写了`__call__()`方法，那么这个对象就是callable的。
+
+```python
+class Test():
+    def __call__(self):
+        print("call me!")
+
+        
+t = Test()
+t()  # call me
+```
+
+实现类装饰器
+
+```python
+class Test(object):
+    def __init__(self, func):
+        print("---初始化---")
+        print(f"func name is {func.__name__}")
+        self.__func = func
+    
+    def __call__(self):
+        print("---装饰器中的功能---")
+        self.__func()
+        
+# 说明
+# 1. 当用Test作为装饰器来对test()函数进行装饰的时候，首先会创建一个Test的实例对象
+# 并且会把test这个函数引用当做参数传递到__init__方法中
+# 即在__init__方法中的__func变量指向了test函数体
+
+# 2. test引用则相当于指向了Test创建出来的实例对象
+
+# 3. 当在使用test()进行调用的时候，相当于让这个对象()，因此会调用这个对象的__call__方法
+
+# 4. 为了能在__call__方法中去调用原来的test函数体，所以在__init__方法中需要有一个实例属性，用来# 用来保存到原来的test函数体的引用，所以就有了self.__func = func，从而在__call__方法中可以
+# 调用原来的test函数体
+
+@Test
+def test():
+    print("---test---")
+
+
+test()
+```
 
 ## 第2节 Linux系统编程
 
