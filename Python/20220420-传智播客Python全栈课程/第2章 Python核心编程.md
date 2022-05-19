@@ -1,3 +1,5 @@
+[TOC]
+
 # 第1节 Python核心编程
 
 开始时间：20220421
@@ -750,6 +752,267 @@ def test():
 
 test()
 ```
+
+### 2.4 作用域
+
+#### 2.4.1 什么是命名空间
+
+它表示着一个标识符（identifier）的可见范围。
+
+#### 2.4.2 globals、locals
+
+打印全局变量和局部变量`print(globals()/locals())`
+
+#### 2.4.3 LEGB规则
+
+Python 使用 LEGB 的顺序来查找一个符号对应的对象
+
+```
+locals -> enclosing function -> globals -> builtins
+```
+
+- locals，当前命名空间
+- enclosing，外部嵌套函数的命名空间（闭包中常见）
+- globals，全局变量，函数定义所在模块的命名空间
+- builtins，内建模块的命名空间
+
+### 2.5 Python是动态语言
+
+#### 2.5.1 动态语言的定义
+
+动态语言是在运行时可以改变其结构的编程语言。如PHP、Ruby、JavaScript、Python等都属于动态语言，而C、C++则不属于。
+
+#### 2.5.2 运行时给对象绑定（添加）属性
+
+```python
+class Persion(object):
+    def __init__(self, name=None, age=None):
+        self.name = name
+        self.age = age
+        
+
+p1 = Person("Molly", 26)
+```
+
+如果想添加性别这个属性，可以：
+
+```python
+p1.sex = "male"
+
+p1.sex  # 'male'
+```
+
+虽然定义的类里面没有sex这个属性，但是Python是动态语言，可以动态给实例绑定属性。
+
+#### 2.5.3 运行时给类绑定（添加）属性
+
+```python
+p2 = Person("Tim", 27)
+p2.sex
+# 会报错，提示实例p2没有属性sex,上面的代码只是给实例p1绑定了属性sex，不具有通用性
+
+# 因此，可以给Person类添加sex属性
+Person.sex = None
+p2 = Person("Tim", 27)
+print(p2.sex)  # 如果p2这个实例对象没有sex属性，则会去类中查找类属性
+# 会打印None
+```
+
+#### 2.5.4 运行时给类绑定（添加）方法
+
+```python
+import types
+
+# 定义了一个类
+class Person(object):
+    num = 0
+    def __init__(self, name = None, age = None):
+        self.name = name
+        self.age = age
+    def eat(self):
+        print("eat food")
+
+# 定义一个实例方法
+def run(self, speed):
+    print("%s在移动, 速度是 %d km/h"%(self.name, speed))
+
+# 定义一个类方法
+@classmethod
+def testClass(cls):
+    cls.num = 100
+
+# 定义一个静态方法
+@staticmethod
+def testStatic():
+    print("---static method----")
+
+# 创建一个实例对象
+P = Person("老王", 24)
+# 调用在class中的方法
+P.eat()
+
+# 给这个对象添加实例方法
+P.run = types.MethodType(run, P)
+# 调用实例方法
+P.run(180)
+
+# 给Person类绑定类方法
+Person.testClass = testClass
+# 调用类方法
+print(Person.num)
+Person.testClass()
+print(Person.num)
+
+# 给Person类绑定静态方法
+Person.testStatic = testStatic
+# 调用静态方法
+Person.testStatic()
+```
+
+#### 2.5.6 \_\_slots\_\_
+
+如果想要限制实例的属性，比如，只允许对Person实例添加name和age属性。
+
+```python
+class Person(object):
+    __slots__ = ("name", "age")
+    
+    
+p = Person()
+p.name = "Tim"
+p.age = 27
+p.addr = "Wuhan"  # 报错AttributeError: Person instance has no attribute 'addr'
+```
+
+注意：
+
+`__slots__`定义的属性只对当前类的实例起作用，对继承的子类不起作用。
+
+### 2.6 生成器
+
+#### 2.6.1 什么是生成器-generator
+
+跟普通函数不同的是，**生成器**是一个返回迭代**器**的函数，只能用于迭代操作，更简单点理解**生成器**就是一个迭代**器**。 在调用**生成器**运行的过程中，每次遇到yield 时函数会暂停并保存当前所有的运行信息，返回yield 的值, 并在下一次执行next() 方法时从当前位置继续运行。 调用一个**生成器**函数，返回的是一个迭代**器**对象。
+
+#### 2.6.2 创建生成器的方法
+
+- 把列表生成式的`[]`改成`()`
+- 通过yield关键字
+
+```python
+#  方法一
+G = (x * 2 for x in range(5))
+
+In [19]: next(G)
+Out[19]: 0
+
+In [20]: next(G)
+Out[20]: 2
+
+In [21]: next(G)
+Out[21]: 4
+
+In [22]: next(G)
+Out[22]: 6
+
+In [23]: next(G)
+Out[23]: 8
+
+In [24]: next(G)
+--------------------------------------------------------
+StopIteration                             Traceback (most recent call last)
+<ipython-input-24-380e167d6934> in <module>()
+----> 1 next(G)
+
+StopIteration: 
+    
+#  方法二
+def fib(times):
+    n = 0
+    a, b = 0, 1
+    while n < times:
+        yield b
+        a, b = b, a + b
+        n += 1
+    return "done"
+        
+```
+
+#### 2.6.3 send关键字
+
+```python
+def gen():
+    i = 0
+    while i < 5:
+        temp = yield i
+        print(temp)
+        i += 1
+        
+
+g = gen()  # g is a generator
+g.send("helloWorld")
+```
+
+当执行到yield时，gen函数作用暂时保存，返回i的值，temp可以接受来自`g.send("helloWorld")`中send方法传递过来的值，`g.next()`等价于`g.send(None)`
+
+```python
+#  next函数的使用
+g = gen()
+next(g)  # 0
+next(g)  # 1
+#  ... 直到抛出异常StopIteration
+
+#  使用__next__()方法
+g.__next__()  # 0
+#  ... 直到抛出异常StopIteration
+
+#  使用send方法
+g.__next__()  # 0
+g.send("helloWorld")  # helloWorld 1
+```
+
+#### 2.6.4 总结
+
+生成器就是这样一个函数，记住返回时函数上一次执行的位置。
+
+生成器的特点：
+
+- 节约内存
+- 提升代码可读性
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ## 第2节 Linux系统编程
 
