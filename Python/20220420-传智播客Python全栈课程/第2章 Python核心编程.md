@@ -890,9 +890,9 @@ p.addr = "Wuhan"  # 报错AttributeError: Person instance has no attribute 'addr
 
 ### 2.6 生成器
 
-#### 2.6.1 什么是生成器-generator
+#### 2.6.1 什么是生成器generator
 
-跟普通函数不同的是，**生成器**是一个返回迭代**器**的函数，只能用于迭代操作，更简单点理解**生成器**就是一个迭代**器**。 在调用**生成器**运行的过程中，每次遇到yield 时函数会暂停并保存当前所有的运行信息，返回yield 的值, 并在下一次执行next() 方法时从当前位置继续运行。 调用一个**生成器**函数，返回的是一个迭代**器**对象。
+跟普通函数不同的是，**生成器**是一个返回迭代器的函数，只能用于迭代操作，更简单点理解**生成器**就是一个迭代器。 在调用**生成器**运行的过程中，每次遇到yield 时函数会暂停并保存当前所有的运行信息，返回yield 的值, 并在下一次执行next() 方法时从当前位置继续运行。 调用一个**生成器**函数，返回的是一个迭代器对象。
 
 #### 2.6.2 创建生成器的方法
 
@@ -980,17 +980,224 @@ g.send("helloWorld")  # helloWorld 1
 - 节约内存
 - 提升代码可读性
 
+## 03. Python高级三
+
+### 3.1 元类
+
+#### 3.1.1 类也是一种对象
+
+通俗来说，类就是一段用来生成对象的代码段。本质上，类也是一种对象，只要你使用`class`关键字，Python解释器就会在执行的时候创建一个对象，这个对象拥有创建实例的能力。
+
+#### 3.1.2 动态地创建类
+
+因为类也是对象，故而可以在使用的时候动态地创建。
+
+```python
+def choose_class(name):
+    if name == "foo":
+        class Foo(object):
+            pass
+        return Foo  # 返回的是类对象，而不是类的实例
+    else:
+        class Bar(object):
+            pass
+        return Bar
+    
+    
+MyClass = choose_class("foo")
+print(MyClass)  # <class '__main__.choose_class.<locals>.Foo'>
+# 函数返回的是一个类，而不是类的实例对象
+print(MyClass())  # 可以通过这个类创建类实例，即类的实例对象
+#  <__main__.choose_class.<locals>.Foo object at 0x000001FD820B0550>
+```
+
+#### 3.1.3 使用type来创建类
+
+虽然通过上面的方式，一定程度上实现了动态创建不同的类，但是仍然需要编码定义整个类，由于类也是一种对象，是否有一种方法可以生成类对象呢？
+
+此时，type出场了，殊不知，它还有一种特殊的作用，**动态创建类**。
+
+type可以接受一个类的描述作为参数，然后返回一个类。
+
+type(类名, 由父类名称组成的元组(针对继承的情况而定，可以为空), 包含属性的字典)
+
+```python
+# 传统方式定义一个类
+class Test(object):
+    pass
+
+Test()  # 创建了一个Test类的实例对象
 
 
+Test2 = type("Test2", (), {})  # 定义了一个Test2类
+Test2()  # 创建了一个Test2类的实例对象
+```
 
+#### 3.1.4 使用type创建带有属性的类
 
+type接收一个字典类为类定义属性
 
+```python
+Foo = type("Foo", (), {"bar": True})
 
+# 等价于
+class Foo(object):
+    bar = True
+    
+FooChild = type("FooChild", (Foo,), {})
+# FooChild子类继承自Foo父类
+```
 
+#### 3.1.5 使用type创建带有方法的类
 
+添加实例方法
 
+```python
+def echo_bar(self):
+    """定义了一个普通的函数"""
+    print(self.bar)
+    
+FooChild = type("FooChild", (Foo,), {"echo_bar": echo_bar})
 
+hasattr(Foo, "echo_bar")  # False
+hasattr(FooChild, "echo_bar")  # True
 
+my_foo = FooChild()
+my_foo.echo_bar()  # True
+```
+
+添加静态方法
+
+```python
+@staticmethod
+def testStatic():
+    print("static method")
+    
+    
+FooChild = type("FooChild", (Foo,), {"testStatic": testStatic})
+```
+
+添加类方法
+
+```python
+@classmethod
+def testClass(cls):
+    print(cls.bar)
+
+    
+# 后面的同上
+```
+
+#### 3.1.6 什么是元类
+
+元类就是用来创建类的东西，通俗的说，元类就是类的类
+
+```python
+MyClass = MetaClass()  # 使用元类创建一个对象，这个对象就是类
+MyObject = MyClass()  # 使用类来创建出实例对象
+```
+
+上面提到过，type可以创建类：
+
+```python
+MyClass = type("MyClass", (), {})
+```
+
+本质上type也是一个元类，类似于str是创建字符串对象的类，int是创建整数对象的类，可通过`__class__`属性检查。
+
+```python
+>>> age = 35
+>>> age.__class__
+<type 'int'>
+>>> name = 'bob'
+>>> name.__class__
+<type 'str'>
+>>> def foo(): pass
+>>>foo.__class__
+<type 'function'>
+>>> class Bar(object): pass
+>>> b = Bar()
+>>> b.__class__
+<class '__main__.Bar'>
+```
+
+然后，那么对于任何一个`__class__`的`__class__`属性又是什么呢？
+
+```python
+>>> a.__class__.__class__
+<type 'type'>
+>>> age.__class__.__class__
+<type 'type'>
+>>> foo.__class__.__class__
+<type 'type'>
+>>> b.__class__.__class__
+<type 'type'>
+```
+
+因此，type就是用来创建类对象的元类。
+
+#### 3.1.7 \__metaclass__属性
+
+可以在定义一个类的时候添加`__mataclass_`属性
+
+```python
+class Foo(object):
+    __metaclass__ = something...
+```
+
+在创建Foo类时，Python解释器会先在类的定义代码块中查看是否有\__metaclass__属性，如果有，就会用它来创建Foo类；如果没有，则会用内建的type类创建这个类
+
+#### 3.1.8 自定义元类
+
+元类的目的是为了在创建一个类时可以灵活的改变，从而得到符合当前上下文的类。
+
+```python
+#coding=utf-8
+
+class UpperAttrMetaClass(type):
+    # __new__ 是在__init__之前被调用的特殊方法
+    # __new__是用来创建对象并返回之的方法
+    # 而__init__只是用来将传入的参数初始化给对象
+    # 你很少用到__new__，除非你希望能够控制对象的创建
+    # 这里，创建的对象是类，我们希望能够自定义它，所以我们这里改写__new__
+    # 如果你希望的话，你也可以在__init__中做些事情
+    # 还有一些高级的用法会涉及到改写__call__特殊方法，但是我们这里不用
+    def __new__(cls, future_class_name, future_class_parents, future_class_attr):
+        #遍历属性字典，把不是__开头的属性名字变为大写
+        newAttr = {}
+        for name,value in future_class_attr.items():
+            if not name.startswith("__"):
+                newAttr[name.upper()] = value
+
+        # 方法1：通过'type'来做类对象的创建
+        # return type(future_class_name, future_class_parents, newAttr)
+
+        # 方法2：复用type.__new__方法
+        # 这就是基本的OOP编程，没什么魔法
+        # return type.__new__(cls, future_class_name, future_class_parents, newAttr)
+
+        # 方法3：使用super方法
+        return super(UpperAttrMetaClass, cls).__new__(cls, future_class_name, future_class_parents, newAttr)
+
+# python3的用法
+# class Foo(object, metaclass = UpperAttrMetaClass):
+#     bar = 'bip'
+
+print(hasattr(Foo, 'bar'))
+# 输出: False
+print(hasattr(Foo, 'BAR'))
+# 输出:True
+
+f = Foo()
+print(f.BAR)
+# 输出:'bip'
+```
+
+元类的作用：
+
+- 拦截类的创建
+- 修改类
+- 返回修改之后的类
 
 
 
