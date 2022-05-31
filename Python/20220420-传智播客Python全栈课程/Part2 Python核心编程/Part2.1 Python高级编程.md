@@ -1,10 +1,10 @@
 [TOC]
 
-# 第1节 Python核心编程
+# 第1节 Python高级编程
 
 开始时间：20220421
 
-结束时间：
+结束时间：20220531
 
 ## 01- Python高级一
 
@@ -1352,11 +1352,176 @@ gc模块中会有一个长度为3的列表的计数器，可以通过`gc.get_cou
 
 3是指距离上一次二代垃圾检查，已经执行过的一代垃圾检查的次数。0是指距离上一次三代垃圾检查，已经执行过的二代垃圾检查的次数。
 
-## 第2节 Linux系统编程
+### 3.3 内建属性
 
-## 第3节 网络编程
+常见的内建属性：
 
-## 第4节 web服务器案例
+| 常用专有属性       | 说明                  | 触发方式                              |
+| ------------------ | --------------------- | ------------------------------------- |
+| `__init__`         | 构造初始化函数        | 创建实例后，赋值时使用，在`__new__`后 |
+| `__new__`          | 生成实例所需属性      | 创建实例时                            |
+| `__class__`        | 实例所在的类          | 实例.`__class__`                      |
+| `__str__`          | 实例字符串表示,可读性 | print(类实例)，如没实现，使用repr结果 |
+| `__repr__`         | 实例字符串表示,准确性 | 类实例或者print(repr(类实例))         |
+| `__del__`          | 析构                  | del删除实例                           |
+| `__dict__`         | 实例自定义属性        | `vars(实例.__dict__)`                 |
+| `__doc__`          | 类文档,子类不继承     | help(类或实例)                        |
+| `__getattribute__` | 属性访问拦截器        | 访问实例属性时                        |
+| `__bases__`        | 类的所有父类构成元素  | `类名.__bases__`                      |
 
-## 第5节 正则表达式
+`__getattribute__`的例子：
+
+```python
+class Itcast(object):
+    def __init__(self, subject1):
+        self.subject1 = subject1
+        self.subject2 = "cpp"
+        
+    # 属性访问拦截器，打log
+    def __getattribute__(self, obj):
+        if obj == "subject1":
+        	print("log subject1")
+            return "redirect python"
+        else:
+            return object.__getattribute__(self, obj)
+    
+    def show(self):
+        print("this is itcast")
+      
+    
+s = Itcast("python")
+print(s.subject1)  # subject1会作为字符串传入__getattribute__方法中
+print(s.subject2)
+```
+
+打印结果：
+
+```python
+log subject1
+redirect python
+cpp
+```
+
+> `__getattribute__`的坑
+
+```python
+class Person(object):
+    def __getattribute__(self, obj):
+        print("---test---")
+        if obj.startswith("a"):
+            return "haha"
+        else:
+            return self.test
+        
+    def test(self):
+        print("heihei")
+    
+    
+t.Person()
+t.a  # 返回haha
+t.b  # 会让程序崩掉
+# 原因是，当t.b执行时，会调用到Person类中的__getattribute__方法，但是这个方法在执行过程中的if条件不满足，会执行else中的代码，即 return self.test。由于需要返回self.test，那么就需要获取self.test的值，而此时self表示的就是t这个实例对象，所以self.test就是t.test，此时要获取t这个对象的test属性，那么还是会调用到__getattribute__方法，由此产生了递归调用，而这个递归调用没有跳出条件，形成了死循环。
+
+# 注意：不能在__getattribute__方法中调用self.xxx
+```
+
+### 3.4 内建函数
+
+启动python解释器，输入`dir(__builtins__)`，就可以看到python解释器启动后默认加载的属性和函数，这些函数称为内建函数。cpython解释器用C语言实现了这些函数，启动解释器时会默认加载。
+
+### 3.5 functools
+
+一些工具函数放在此包中。
+
+> wraps函数
+
+使用装饰器时，被装饰的函数会发生一些改变，函数名等函数属性会发生改变。比如：装饰后的函数名和函数的doc发生变化。
+
+```python
+def note(func):
+    """note function"""
+    def wrapper():
+        """wrapper function"""
+        print("note something")
+        return func()
+    return wrapper
+
+
+@note
+def test():
+    """test function"""
+    print("I am test")
+
+    
+test()
+print(test.__doc__)
+```
+
+运行结果
+
+```python
+note something
+I am test
+wrapper function
+```
+
+由于test函数的doc无法查看到，为了消除装饰器带来的这种影响，Python你的functools包中提供了一个叫wraps的装饰器。
+
+```python
+import functools
+
+def note(func):
+    """note function"""
+    @functools.wraps(func)
+    def wrapper():
+        """wrapper function"""
+        print("note something")
+        return func()
+    return wrapper
+
+
+@note
+def test():
+    """test function"""
+    print("I am test")
+    
+    
+test()
+print(test.__doc__)
+```
+
+运行结果
+
+```python
+note something
+I am test
+test function
+```
+
+### 3.6 模块进阶
+
+Python中有一套标准库（standard library），会随着Python解释器一起安装在本地环境中，它是Python的一个组成部分。
+
+常用的标准库
+
+| 标准库          | 说明                   |
+| --------------- | ---------------------- |
+| builtins        | 内建函数默认加载       |
+| os              | 操作系统接口           |
+| sys             | Python自身的运行环境   |
+| functools       | 常用的工具             |
+| json            | 编码和解码 JSON 对象   |
+| logging         | 记录日志，调试         |
+| multiprocessing | 多进程                 |
+| threading       | 多线程                 |
+| copy            | 拷贝                   |
+| time            | 时间                   |
+| datetime        | 日期和时间             |
+| calendar        | 日历                   |
+| hashlib         | 加密算法               |
+| random          | 生成随机数             |
+| re              | 字符串正则匹配         |
+| socket          | 标准的 BSD Sockets API |
+| shutil          | 文件和目录管理         |
+| glob            | 基于文件通配符搜索     |
 
