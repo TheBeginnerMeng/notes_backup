@@ -1,3 +1,5 @@
+# 学习阶段
+
 阶段一：Java 基础
 
 - Java 基础
@@ -48,6 +50,8 @@
 - ES
 - 实例：仿京东搜索
 
+# 阶段八：MyBatisPlus
+
 > MyBatisPlus 概述
 
 需要提前掌握的基础知识：MyBatis、Spring、SpringMVC
@@ -70,3 +74,99 @@ MyBatisPlus出现的原因：“为偷懒而生”，进一步简化了 CRUD 操
 - **分页插件支持多种数据库**：支持 MySQL、MariaDB、Oracle、DB2、H2、HSQL、SQLite、Postgre、SQLServer 等多种数据库
 - **内置性能分析插件**：可输出 SQL 语句以及其执行时间，建议开发测试时启用该功能，能快速揪出慢查询
 - **内置全局拦截插件**：提供全表 delete 、 update 操作智能分析阻断，也可自定义拦截规则，预防误操作
+
+> Java项目命名方式
+
+命名包名目录的方式 ：com.公司名的简写.项目的名字.业务模块名
+
+所有的学不会都是给懒找的借口！！！
+
+# 快速入门
+
+地址：[快速开始 | MyBatis-Plus (baomidou.com)](https://baomidou.com/pages/226c21/#初始化工程)
+
+使用第三方组件的一般方式：
+
+1、导入对应的依赖
+
+2、研究依赖如何配置
+
+3、代码如何编写
+
+4、提高扩展技术能力
+
+> 步骤
+
+1、创建数据库`mybatis_plus`
+
+2、创建 user 表
+
+```mysql
+DROP TABLE IF EXISTS user;
+
+CREATE TABLE user
+(
+    id BIGINT(20) NOT NULL COMMENT '主键ID',
+    name VARCHAR(30) NULL DEFAULT NULL COMMENT '姓名',
+    age INT(11) NULL DEFAULT NULL COMMENT '年龄',
+    email VARCHAR(50) NULL DEFAULT NULL COMMENT '邮箱',
+    PRIMARY KEY (id)
+);
+-- 真实开发中，还有一些必需字段，如version（乐观锁）、deleted（逻辑删除）、gmt_create、gmt_modified
+
+DELETE FROM user;
+
+INSERT INTO user (id, name, age, email) VALUES
+(1, 'Jone', 18, 'test1@baomidou.com'),
+(2, 'Jack', 20, 'test2@baomidou.com'),
+(3, 'Tom', 28, 'test3@baomidou.com'),
+(4, 'Sandy', 21, 'test4@baomidou.com'),
+(5, 'Billie', 24, 'test5@baomidou.com');
+```
+
+3、编写项目，先初始化一个 SpringBoot 项目（可以使用 [Spring Initializer (opens new window)](https://start.spring.io/)快速初始化一个 Spring Boot 工程）
+
+4、添加并导入依赖
+
+```xml
+<dependency>
+      <!-- 数据库驱动 -->
+         <groupId>mysql</groupId>
+         <artifactId>mysql-connector-java</artifactId>
+         <version>8.0.27</version>
+      </dependency>
+	 <!-- lombok 插件 -->
+      <dependency>
+         <groupId>org.projectlombok</groupId>
+         <artifactId>lombok</artifactId>
+      </dependency>
+      <!-- mybatis-plus 驱动 -->
+	  <!-- mybatis-plus 其实是自己开发的，并非官方的！ -->
+      <dependency>
+         <groupId>com.baomidou</groupId>
+         <artifactId>mybatis-plus-boot-starter</artifactId>
+         <version>3.0.5</version>
+      </dependency>
+```
+
+说明：我们使用 mybatis-plus 可以节省大量的代码，尽量不要同时导入 mybatis 和 mybatis-plus ！版本的差异！
+
+5、连接数据库，这一步和 mybatis 相同
+
+```properties
+# mysql 5 驱动不同 com.mysql.jdbc.Driver
+
+# mysql 8 驱动不同 com.mysql.cj.jdbc.Driver、需要增加时区的配置
+spring.datasource.username=root
+spring.datasource.password=123mysql
+spring.datasource.url=jdbc:mysql://localhost:3306/mybatis_plus?useSSL=false&useUnicode=true&characterEncoding=utf-8&serverTimezone=GMT%2B8
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+```
+
+==6、传统方式 pojo-dao（连接 mybatis，配置 mapper.xml 文件）– service – controller==
+
+6、使用了 mybatis-plus 之后
+
+- pojo
+- mapper 接口
+- 使用
