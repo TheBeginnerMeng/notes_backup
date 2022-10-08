@@ -168,5 +168,85 @@ spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
 6、使用了 mybatis-plus 之后
 
 - pojo
+
+```java
+package com.loveling.pojo;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class User {
+
+    private Long id;
+    private String name;
+    private Integer age;
+    private String email;
+
+}
+```
+
 - mapper 接口
-- 使用
+
+```java
+package com.loveling.mapper;
+
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.loveling.pojo.User;
+import org.springframework.stereotype.Repository;
+
+// 在对应的 Mapper 上面继承基本的类 BaseMapper
+@Repository // 代表持久层
+public interface UserMapper extends BaseMapper<User> {
+
+    // 所有的 CRUD 已经完成
+    // 不需要像以前那样配置一大堆文件
+}
+
+```
+
+- 注意点：需要在主启动类上去扫描我们的 mapper 包下的所有接口==@MapperScan("com.loveling.mapper")==
+- 测试类中测试
+
+```java
+package com.loveling;
+
+import com.loveling.mapper.UserMapper;
+import com.loveling.pojo.User;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+
+import java.util.List;
+
+@SpringBootTest
+class MybatisPlusApplicationTests {
+
+	// 继承了 BaseMapper，所有的方法都来自所继承的父类
+	// 当然，我们也可以编写自己的方法
+	@Autowired
+	private UserMapper userMapper;
+
+	@Test
+	void contextLoads() {
+		// 参数是一个 Wrapper，条件构造器，这里我们先不用，置为 null
+		// 查询全部用户
+		List<User> users = userMapper.selectList(null);
+		users.forEach(System.out::println);
+	}
+
+}
+```
+
+- 结果
+
+![image-20221008230543582](C:\Users\timla\AppData\Roaming\Typora\typora-user-images\image-20221008230543582.png)
+
+> 思考
+
+1、SQL谁帮我们写的？MyBatis-Plus都写好了。
+
+2、方法哪里来的？MyBatis-Plus都写好了。
